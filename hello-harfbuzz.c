@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <hb.h>
+#include <hb-ot.h>
 #include <hb-ft.h>
 #include <cairo.h>
 #include <cairo-ft.h>
@@ -12,17 +13,7 @@
 int
 main(int argc, char **argv)
 {
-  const char *fontfile;
-  const char *text;
-
-  if (argc < 3)
-  {
-    fprintf (stderr, "usage: hello-harfbuzz font-file.ttf text\n");
-    exit (1);
-  }
-
-  fontfile = argv[1];
-  text = argv[2];
+  const char *fontfile = "./MathTestFontFull.otf";
 
   /* Initialize FreeType and create FreeType font face. */
   FT_Library ft_library;
@@ -43,11 +34,14 @@ main(int argc, char **argv)
   /* Create hb-buffer and populate. */
   hb_buffer_t *hb_buffer;
   hb_buffer = hb_buffer_create ();
-  hb_buffer_add_utf8 (hb_buffer, text, -1, 0, -1);
-  hb_buffer_guess_segment_properties (hb_buffer);
+  hb_buffer_add (hb_buffer, 0x2195, 0);
+  hb_buffer_set_content_type (hb_buffer, HB_BUFFER_CONTENT_TYPE_UNICODE);
+  hb_buffer_set_direction (hb_buffer, HB_DIRECTION_LTR);
 
   /* Shape it! */
   hb_shape (hb_font, hb_buffer, NULL, 0);
+  if (!hb_ot_shape_math_stretchy (hb_font, hb_buffer, 0, FONT_SIZE*64*10))
+    abort();
 
   /* Get glyph information and positions out of the buffer. */
   unsigned int len = hb_buffer_get_length (hb_buffer);
