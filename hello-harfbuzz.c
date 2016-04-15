@@ -90,6 +90,12 @@ main(int argc, char **argv)
     }
   }
 
+  /* Set the vertical position of the glyphs so that the top glyph is at offset 0*/
+  for (unsigned int i = 0; i < len; i++)
+  {
+    pos[i].y_offset -= pos[len - 1].y_offset;
+  }
+
   /* Draw, using cairo. */
   double width = 2 * MARGIN;
   double height = 2 * MARGIN;
